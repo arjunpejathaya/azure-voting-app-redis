@@ -35,7 +35,6 @@ jobs:
        docker push $NAME
     - name: Deploy to Azure Kubernetes
       run: |
-       cd ..
        AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)
        az aks get-credentials --resource-group $RGNAME --name $AKSNAME
        kubectl apply -f azure-vote-all-in-one-redis.yaml
