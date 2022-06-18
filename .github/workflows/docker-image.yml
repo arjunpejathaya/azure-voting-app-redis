@@ -25,8 +25,8 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Build the Docker image
       run: |
-       echo ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)
-       echo AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)
+       echo "ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)" >> $GITHUB_ENV
+       echo "AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)" >> $GITHUB_ENV
        cd azure-vote
        docker build . --file Dockerfile --tag $ACRSERVERURL/voting-app:latest
        docker push $ACRSERVERURL/voting-app:latest
