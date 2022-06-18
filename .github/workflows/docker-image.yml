@@ -27,7 +27,9 @@ jobs:
        cd azure-vote
        docker build . --file Dockerfile --tag voting-app:latest
     - name: Get Login Server for ACR Push
-      run: ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)
+      run: |
+       ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)
+       AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)
     - name: Azure Container Registry Login
       uses: Azure/docker-login@v1
       with:
@@ -40,5 +42,6 @@ jobs:
     - name: Deploy to Azure Kubernetes
       run: |
        cd ..
+       az aks get-credentials --resource-group $RGNAME --name $AKSNAME
        kubectl apply -f azure-vote-all-in-one-redis.yaml
 
