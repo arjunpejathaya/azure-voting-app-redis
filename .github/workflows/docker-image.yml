@@ -27,19 +27,10 @@ jobs:
       run: |
        echo "ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)" >> $GITHUB_ENV
        echo "AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)" >> $GITHUB_ENV
-       NAME=$ACRSERVERURL./voting-app:latest
+       NAME=$($ACRSERVERURL."/voting-app:latest")
        cd azure-vote
        docker build . --file Dockerfile --tag $NAME
        docker push $NAME
-    - name: Azure Container Registry Login
-      uses: Azure/docker-login@v1
-      with:
-        # Container registry username
-        username: ${{ secrets.ACR_USERNAME }} 
-        # Container registry password
-        password: ${{ secrets.ACR_PASSWORD }}
-        # Container registry server url
-        login-server: $ACRSERVERURL
     - name: Deploy to Azure Kubernetes
       run: |
        cd ..
