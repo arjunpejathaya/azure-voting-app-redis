@@ -1,0 +1,44 @@
+name: Voting App Workflow
+
+env:
+   RGNAME: "AZ-400"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Azure Login
+      uses: Azure/login@v1.4.4
+      with:
+        # Paste output of `az ad sp create-for-rbac` as value of secret variable: AZURE_CREDENTIALS
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - name: Build the Docker image
+      run: |
+       cd azure-vote
+       docker build . --file Dockerfile --tag voting-app:latest
+    - name: Get Login Server for ACR Push
+      run: ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)
+    - name: Azure Container Registry Login
+      uses: Azure/docker-login@v1
+      with:
+        # Container registry username
+        username: ${{ secrets.ACR_USERNAME }} 
+        # Container registry password
+        password: ${{ secrets.ACR_PASSWORD }}
+        # Container registry server url
+        login-server: $ACRSERVERURL
+    - name: Deploy to Azure Kubernetes
+      run: |
+       cd ..
+       kubectl apply -f azure-vote-all-in-one-redis.yaml
+
