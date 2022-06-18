@@ -26,15 +26,17 @@ jobs:
     - name: Build the Docker image
       run: |
        ACRSERVERURL=$(az acr list --resource-group $RGNAME --query "[].loginServer" --output tsv)
-       AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)
+       ACRNAME=$(az acr list --resource-group $RGNAME --query "[].name" --output tsv)
        NAME="${ACRSERVERURL}/voting-app:latest"
        echo $NAME
        cd azure-vote
        docker build . --file Dockerfile --tag $NAME
+       az acr login --name 
        docker push $NAME
     - name: Deploy to Azure Kubernetes
       run: |
        cd ..
+       AKSNAME=$(az aks list --resource-group $RGNAME --query "[].name" --output tsv)
        az aks get-credentials --resource-group $RGNAME --name $AKSNAME
        kubectl apply -f azure-vote-all-in-one-redis.yaml
 
