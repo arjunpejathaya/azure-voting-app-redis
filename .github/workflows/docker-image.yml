@@ -31,7 +31,7 @@ jobs:
        echo $NAME
        cd azure-vote
        docker build . --file Dockerfile --tag $NAME
-       az acr login --name 
+       az acr login --name $ACRNAME
        docker push $NAME
     - name: Deploy to Azure Kubernetes
       run: |
